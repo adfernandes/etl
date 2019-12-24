@@ -33,6 +33,7 @@ SOFTWARE.
 
 #include "platform.h"
 #include "basic_string.h"
+#include "string_view.h"
 #include "hash.h"
 
 #if ETL_CPP11_SUPPORTED && !defined(ETL_STLPORT) && !defined(ETL_NO_STL)
@@ -168,6 +169,16 @@ namespace etl
 #endif
 
     //*************************************************************************
+    /// From string_view.
+    ///\param view The string_view.
+    //*************************************************************************
+    explicit u32string(const etl::u32string_view& view)
+      : iu32string(reinterpret_cast<value_type*>(&buffer), MAX_SIZE)
+    {
+      this->assign(view.begin(), view.end());
+    }
+
+    //*************************************************************************
     /// Returns a sub-string.
     ///\param position The position of the first character. Default = 0.
     ///\param length   The number of characters. Default = npos.
@@ -180,7 +191,7 @@ namespace etl
       {
         ETL_ASSERT(position < size(), ETL_ERROR(string_out_of_bounds));
 
-        length_ = std::min(length_, size() - position);
+        length_ = ETL_STD::min(length_, size() - position);
 
         new_string.assign(buffer + position, buffer + position + length_);
       }
@@ -251,6 +262,24 @@ namespace etl
     }
   };
 #endif
+
+  //***************************************************************************
+  /// Make u32string from UTF-16 string literal or char32_t array
+  //***************************************************************************
+  template<const size_t MAX_SIZE>
+  etl::u32string<MAX_SIZE - 1> make_string(const char32_t (&text) [MAX_SIZE])
+  {
+    return etl::u32string<MAX_SIZE - 1>(text, MAX_SIZE - 1);
+  }
+
+  //***************************************************************************
+  /// Make string with max capacity from string literal or char array
+  //***************************************************************************
+  template<const size_t MAX_SIZE, const size_t SIZE>
+  etl::u32string<MAX_SIZE> make_string_with_capacity(const char32_t(&text)[SIZE])
+  {
+    return etl::u32string<MAX_SIZE>(text, SIZE - 1);
+  }
 }
 
 #include "private/minmax_pop.h"

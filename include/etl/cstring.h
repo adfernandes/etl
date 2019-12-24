@@ -33,6 +33,7 @@ SOFTWARE.
 
 #include "platform.h"
 #include "basic_string.h"
+#include "string_view.h"
 #include "hash.h"
 
 #if ETL_CPP11_SUPPORTED && !defined(ETL_STLPORT) && !defined(ETL_NO_STL)
@@ -168,6 +169,16 @@ namespace etl
 #endif
 
     //*************************************************************************
+    /// From string_view.
+    ///\param view The string_view.
+    //*************************************************************************
+    explicit string(const etl::string_view& view)
+      : istring(reinterpret_cast<value_type*>(&buffer), MAX_SIZE)
+    {
+      this->assign(view.begin(), view.end());
+    }
+
+    //*************************************************************************
     /// Returns a sub-string.
     ///\param position The position of the first character.  Default = 0.
     ///\param length   The number of characters. Default = npos.
@@ -180,7 +191,7 @@ namespace etl
       {
         ETL_ASSERT(position < this->size(), ETL_ERROR(string_out_of_bounds));
 
-        length_ = std::min(length_, this->size() - position);
+        length_ = ETL_STD::min(length_, this->size() - position);
 
         new_string.assign(buffer + position, buffer + position + length_);
       }
@@ -237,7 +248,7 @@ namespace etl
     size_t operator()(const etl::istring& text) const
     {
       return etl::private_hash::generic_hash<size_t>(reinterpret_cast<const uint8_t*>(&text[0]),
-                                                         reinterpret_cast<const uint8_t*>(&text[text.size()]));
+                                                     reinterpret_cast<const uint8_t*>(&text[text.size()]));
     }
   };
 
@@ -247,10 +258,28 @@ namespace etl
     size_t operator()(const etl::string<SIZE>& text) const
     {
       return etl::private_hash::generic_hash<size_t>(reinterpret_cast<const uint8_t*>(&text[0]),
-                                                         reinterpret_cast<const uint8_t*>(&text[text.size()]));
+                                                     reinterpret_cast<const uint8_t*>(&text[text.size()]));
     }
   };
 #endif
+
+  //***************************************************************************
+  /// Make string from string literal or char array
+  //***************************************************************************
+  template<const size_t MAX_SIZE>
+  etl::string<MAX_SIZE - 1> make_string(const char (&text) [MAX_SIZE])
+  {
+    return etl::string<MAX_SIZE - 1>(text, MAX_SIZE - 1);
+  }
+
+  //***************************************************************************
+  /// Make string with max capacity from string literal or char array
+  //***************************************************************************
+  template<const size_t MAX_SIZE, const size_t SIZE>
+  etl::string<MAX_SIZE> make_string_with_capacity(const char(&text)[SIZE])
+  {
+    return etl::string<MAX_SIZE>(text, SIZE - 1);
+  }
 }
 
 #include "private/minmax_pop.h"

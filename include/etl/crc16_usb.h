@@ -7,7 +7,7 @@ Embedded Template Library.
 https://github.com/ETLCPP/etl
 https://www.etlcpp.com
 
-Copyright(c) 2019 jwellbelove
+Copyright(c) 2018 jwellbelove
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files(the "Software"), to deal
@@ -28,19 +28,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ******************************************************************************/
 
-#ifndef ETL_STL_CHOOSE_NAMESPACE_INCLUDED
-#define ETL_STL_CHOOSE_NAMESPACE_INCLUDED
+#ifndef ETL_CRC16_USB_INCLUDED
+#define ETL_CRC16_USB_INCLUDED
 
-#include "../../platform.h"
+#include <stdint.h>
 
-#if defined(ETL_IN_UNIT_TEST)
-  #ifndef ETLSTD
-    #define ETLSTD etlstd // Used for the unit tests.
-  #endif
-#else
-  #ifndef ETLSTD
-    #define ETLSTD std    // Used for normal code.
-  #endif
+#include "platform.h"
+#include "private/crc16_poly_0x8005.h"
+
+#if defined(ETL_COMPILER_KEIL)
+#pragma diag_suppress 1300
 #endif
+
+///\defgroup crc16_modbus 16 bit CRC USB calculation
+///\ingroup crc
+
+namespace etl
+{
+  typedef crc16_poly_0x8005<0xFFFFU, 0xFFFFU, true> crc16_usb;
+}
 
 #endif
