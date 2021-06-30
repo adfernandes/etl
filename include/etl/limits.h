@@ -73,8 +73,8 @@ SOFTWARE.
 #if !defined(HUGE_VAL)
   // Looks like we don't have these macros defined.
   // They're compiler implementation dependent, so we'll make them the same as the max values.
-  #define HUGE_VAL  FLT_MAX
-  #define HUGE_VALF DLB_MAX
+  #define HUGE_VALF FLT_MAX
+  #define HUGE_VAL  DBL_MAX
   #define HUGE_VALL LDBL_MAX
 #endif
 
@@ -331,6 +331,10 @@ namespace etl
     static ETL_CONSTANT int digits10 = ETL_LOG10_OF_2(digits);
     static ETL_CONSTANT bool is_signed = etl::is_signed<wchar_t>::value;
     static ETL_CONSTANT bool is_modulo = etl::is_unsigned<wchar_t>::value;
+
+#if defined(ETL_COMPILER_CLANG) && defined(ETL_CROSS_COMPILING_TO_AVR) && !defined(WCHAR_MIN)
+  #define WCHAR_MIN (-WCHAR_MAX - 1)
+#endif
 
     static ETL_CONSTEXPR wchar_t min() { return WCHAR_MIN; }
     static ETL_CONSTEXPR wchar_t max() { return WCHAR_MAX; }

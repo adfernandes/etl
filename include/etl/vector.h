@@ -553,7 +553,7 @@ namespace etl
     //*********************************************************************
     iterator insert(iterator position, const_reference value)
     {
-      ETL_ASSERT(size() + 1 <= CAPACITY, ETL_ERROR(vector_full));
+      ETL_ASSERT(size() != CAPACITY, ETL_ERROR(vector_full));
 
       if (position == end())
       {
@@ -578,7 +578,7 @@ namespace etl
     //*********************************************************************
     iterator insert(iterator position, rvalue_reference value)
     {
-      ETL_ASSERT(size() + 1 <= CAPACITY, ETL_ERROR(vector_full));
+      ETL_ASSERT(size() != CAPACITY, ETL_ERROR(vector_full));
 
       if (position == end())
       {
@@ -1297,9 +1297,7 @@ namespace etl
       ETL_OVERRIDE
 #endif
     {
-      #if ETL_CPP11_TYPE_TRAITS_IS_TRIVIAL_SUPPORTED
       ETL_ASSERT(etl::is_trivially_copyable<T>::value, ETL_ERROR(etl::vector_incompatible_type));
-      #endif
 
       etl::ivector<T>::repair_buffer(buffer);
     }
@@ -1468,9 +1466,7 @@ namespace etl
       ETL_OVERRIDE
 #endif
     {
-#if ETL_CPP11_TYPE_TRAITS_IS_TRIVIAL_SUPPORTED
       ETL_ASSERT(etl::is_trivially_copyable<T>::value, ETL_ERROR(etl::vector_incompatible_type));
-#endif
 
       etl::ivector<T>::repair_buffer(this->p_buffer);
     }

@@ -1,4 +1,67 @@
 ===============================================================================
+20.12.0
+Added the option to derived etl::message<> from a parent class other than etl::imessage.
+The parent class must ultimately be derived from etl::imessage.
+
+===============================================================================
+20.11.5
+Added Arduino examples.
+
+===============================================================================
+20.11.4
+Fixed etl::circular_buffer copy and move assignment bug where the destination 
+buffer was not cleared before assignment.
+
+===============================================================================
+20.11.3
+Define missing macro when cross compiling with clang for AVR
+
+===============================================================================
+20.11.2
+etl::basic_string::copy is now const and does not affect truncation flags.
+
+===============================================================================
+20.11.1
+Fixed ambiguous function call in etl::mem_cast for clang.
+
+===============================================================================
+20.11.0
+Added etl::mem_cast, etl::mem_cast_ptr & etl::mem_cast_types for reinterpretion of memory blocks.
+State tables in etl::debounce are now constexpr in C++11 or above.
+
+===============================================================================
+20.10.6
+Updated QueuedMessageRouter and QueuedFSM examples to use current message frameworks.
+
+===============================================================================
+20.10.5
+Added container_type to etl::stack, etl::queue and etl::priority_queue.
+
+===============================================================================
+20.10.4
+Fixed cross compiler compatibility for etl::circular_buffer.
+
+===============================================================================
+20.10.3
+Fixed etl::fsm generator for non-default number of message types.
+
+===============================================================================
+20.10.2
+Fixed misspelled histogram class.
+
+===============================================================================
+20.10.1
+Fixed incorrect histogram end() and cend() return values.
+
+===============================================================================
+20.10.0
+Added Hierarchical Finite State Machine (etl::hfsm) derived from etl::fsm
+
+===============================================================================
+20.9.3
+Fixed misspelt DBL_MAX macro.
+
+===============================================================================
 20.9.2
 Fixed ETL_ASSERT for non-class types in etl::pool.
 
