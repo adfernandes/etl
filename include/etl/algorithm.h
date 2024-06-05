@@ -43,6 +43,7 @@ SOFTWARE.
 #include "iterator.h"
 #include "functional.h"
 #include "utility.h"
+#include "gcd.h"
 
 #include <stdint.h>
 #include <string.h>
@@ -1156,21 +1157,148 @@ namespace etl
   //***************************************************************************
   namespace private_algorithm
   {
+#if ETL_USING_CPP11
     //*********************************
+    // For random access iterators
     template <typename TIterator>
     ETL_CONSTEXPR14
-    TIterator rotate_general(TIterator first, TIterator middle, TIterator last)
+    typename etl::enable_if<etl::is_random_access_iterator<TIterator>::value, TIterator>::type
+      rotate_general(TIterator first, TIterator middle, TIterator last) 
     {
+      if (first == middle || middle == last)
+      {
+        return first;
+      }
+
+      typedef typename etl::iterator_traits<TIterator>::value_type value_type;
+
+      int n = last - first;
+      int m = middle - first;
+      int gcd_nm = (n == 0 || m == 0) ? n + m : etl::gcd(n, m);
+
+      TIterator result = first + (last - middle);
+
+      for (int i = 0; i < gcd_nm; i++) 
+      {
+        value_type temp = etl::move(*(first + i));
+        int j = i;
+        
+        while (true) 
+        {
+          int k = j + m;
+          
+          if (k >= n)
+          {
+            k = k - n;
+          }
+          
+          if (k == i)
+          {
+            break;
+          }
+
+          *(first + j) = etl::move(*(first + k));
+          j = k;
+        }
+
+        *(first + j) = etl::move(temp);
+      }
+
+      return result;
+    }
+#else
+    //*********************************
+    // For random access iterators
+    template <typename TIterator>
+    ETL_CONSTEXPR14
+    typename etl::enable_if<etl::is_random_access_iterator<TIterator>::value, TIterator>::type
+      rotate_general(TIterator first, TIterator middle, TIterator last)
+    {
+      if (first == middle || middle == last)
+      {
+        return first;
+      }
+
+      typedef typename etl::iterator_traits<TIterator>::value_type value_type;
+
+      int n = last - first;
+      int m = middle - first;
+      int gcd_nm = (n == 0 || m == 0) ? n + m : etl::gcd(n, m);
+
+      TIterator result = first + (last - middle);
+
+      for (int i = 0; i < gcd_nm; i++)
+      {
+        value_type temp = *(first + i);
+        int j = i;
+
+        while (true)
+        {
+          int k = j + m;
+
+          if (k >= n)
+          {
+            k = k - n;
+          }
+
+          if (k == i)
+          {
+            break;
+          }
+
+          *(first + j) = *(first + k);
+          j = k;
+        }
+
+        *(first + j) = temp;
+      }
+
+      return result;
+    }
+#endif
+
+    //*********************************
+    // For bidirectional iterators
+    template <typename TIterator>
+    ETL_CONSTEXPR14
+    typename etl::enable_if<etl::is_bidirectional_iterator<TIterator>::value, TIterator>::type
+      rotate_general(TIterator first, TIterator middle, TIterator last)
+    {
+      if (first == middle || middle == last)
+      {
+        return first;
+      }
+
+      TIterator result = first;
+      etl::advance(result, etl::distance(middle, last));
+
+      reverse(first, middle);
+      reverse(middle, last);
+      reverse(first, last);
+
+      return result;
+    }
+
+    //*********************************
+    // For forward iterators
+    template <typename TIterator>
+    ETL_CONSTEXPR14
+    typename etl::enable_if<etl::is_forward_iterator<TIterator>::value, TIterator>::type
+      rotate_general(TIterator first, TIterator middle, TIterator last)
+    {
+      if (first == middle || middle == last)
+      {
+        return first;
+      }
+
       TIterator next = middle;
+      TIterator result = first;
+      etl::advance(result, etl::distance(middle, last));
 
       while (first != next)
       {
-        using ETL_OR_STD::swap; // Allow ADL
-
-        swap(*first, *next);
-
-        ++first;
-        ++next;
+        using ETL_OR_STD::swap;
+        swap(*first++, *next++);
 
         if (next == last)
         {
@@ -1182,10 +1310,11 @@ namespace etl
         }
       }
 
-      return first;
+      return result;
     }
 
     //*********************************
+    // Simplified algorithm for rotate left by one
     template <typename TIterator>
     ETL_CONSTEXPR14
     TIterator rotate_left_by_one(TIterator first, TIterator last)
@@ -1206,6 +1335,7 @@ namespace etl
     }
 
     //*********************************
+    // Simplified for algorithm rotate right by one
     template <typename TIterator>
     ETL_CONSTEXPR14
     TIterator rotate_right_by_one(TIterator first, TIterator last)
@@ -1239,7 +1369,18 @@ namespace etl
 
     if (etl::next(middle) == last)
     {
-      return private_algorithm::rotate_right_by_one(first, last);
+#if ETL_USING_CPP20
+      if ETL_IF_CONSTEXPR(etl::is_forward_iterator<TIterator>::value)
+      {
+        return private_algorithm::rotate_general(first, middle, last);
+      }
+      else
+      {
+        return private_algorithm::rotate_right_by_one(first, last);
+      }
+#else
+      return private_algorithm::rotate_general(first, middle, last);
+#endif
     }
 
     return private_algorithm::rotate_general(first, middle, last);
@@ -2001,17 +2142,31 @@ namespace etl
   ///\ingroup algorithm
   //***************************************************************************
   template<typename T, typename TCompare>
-  ETL_CONSTEXPR 
-  const T& clamp(const T& value, const T& low, const T& high, TCompare compare)
+  ETL_CONSTEXPR
+  T clamp(const T& value, const T& low, const T& high, TCompare compare)
   {
     return compare(value, low) ? low : compare(high, value) ? high : value;
   }
   
   template <typename T>
-  ETL_CONSTEXPR 
-  const T& clamp(const T& value, const T& low, const T& high )
+  ETL_CONSTEXPR
+  T clamp(const T& value, const T& low, const T& high)
   {
     return clamp(value, low, high, etl::less<T>());
+  }
+
+  template<typename T, T Low, T High, typename TCompare>
+  ETL_CONSTEXPR
+  T clamp(const T& value, TCompare compare)
+  {
+    return compare(value, Low) ? Low : compare(High, value) ? High : value;
+  }
+
+  template <typename T, T Low, T High>
+  ETL_CONSTEXPR
+  T clamp(const T& value)
+  {
+    return clamp<T, Low, High>(value, etl::less<T>());
   }
 
   //***************************************************************************
@@ -2022,19 +2177,18 @@ namespace etl
   ETL_CONSTEXPR14
   TIterator remove(TIterator first, TIterator last, const T& value)
   {    
+    first = etl::find(first, last, value);
+
     if (first != last)
     {
       TIterator itr = first;
 
-      while (itr != last)
+      while (++itr != last)
       {
         if (!(*itr == value))
         {
-          *first = etl::move(*itr);
-          ++first;
+          *first++ = etl::move(*itr);
         }
-
-        ++itr;
       }
     }
       
@@ -2049,23 +2203,22 @@ namespace etl
   ETL_CONSTEXPR14
   TIterator remove_if(TIterator first, TIterator last, TUnaryPredicate predicate)
   {
+    first = etl::find_if(first, last, predicate);
+
     if (first != last)
     {
       TIterator itr = first;
 
-      while (itr != last)
+      while (++itr != last)
       {
         if (!predicate(*itr))
         {
-          *first = etl::move(*itr);
-          ++first;
+          *first++ = etl::move(*itr);
         }
-
-        ++itr;
       }
     }
 
-    return first;
+    return first; 
   }
 }
 

@@ -1395,6 +1395,12 @@
     <ClInclude Include="..\..\include\etl\crc8_j1850_zero.h">
       <Filter>ETL\Maths\CRC</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\etl\gcd.h">
+      <Filter>ETL\Maths</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\etl\lcm.h">
+      <Filter>ETL\Maths</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\test_string_char.cpp">
@@ -3305,8 +3311,14 @@
     <ClCompile Include="..\test_crc8_j1850_zero.cpp">
       <Filter>Tests\CRC</Filter>
     </ClCompile>
+    <ClCompile Include="..\syntax_check\gcd.h.t.cpp">
+      <Filter>Tests\Syntax Checks\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\syntax_check\lcm.h.t.cpp">
+      <Filter>Tests\Syntax Checks\Source</Filter>
+    </ClCompile>
     <ClCompile Include="..\test_message.cpp">
-      <Filter>Tests</Filter>
+      <Filter>Tests\Messaging</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
