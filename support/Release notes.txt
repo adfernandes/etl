@@ -1,4 +1,25 @@
 ﻿===============================================================================
+20.39.3
+
+Removed C++11 restriction on etl::observer::notification
+
+===============================================================================
+20.39.2
+
+Removed EmbeddedTemplateLibrary-20.39.0.tar.gz from project.
+
+===============================================================================
+20.39.1
+
+Fixes:
+#940 Allow etl::observer notification without argument
+     Added a void specialisation to the < C++11 code.
+#942 Warning on pragma c++20-compat
+
+Updates:
+Added etl::count_of, etl::has_duplicates, etl::has_duplicates_of
+
+===============================================================================
 20.39.0
 
 Refactored:
@@ -36,8 +57,6 @@ Pull Requests
 #935 Added 20 bit integral limits (MSP430 devices)
      New configuration macro, ETL_USE_20BIT_TYPES, which controls the definition of ETL_USING_20BIT_TYPES and ETL_NOT_USING_20BIT_TYPES.
 #939 Fix histogram indexing when accessed via operator[]
-
-
 
 ===============================================================================
 20.38.17

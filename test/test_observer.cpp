@@ -70,12 +70,10 @@ namespace
   //*****************************************************************************
   typedef etl::observer<Notification1, Notification2&, const Notification3&> ObserverType;
 
-#if !defined(ETL_OBSERVER_FORCE_CPP03_IMPLEMENTATION)
   //*****************************************************************************
   // The observer base type that does not take a notification type.
   //*****************************************************************************
   typedef etl::observer<void, int> ObserverVoidIntType;
-#endif
 }
 
 //*****************************************************************************
@@ -117,7 +115,6 @@ public:
 	}
 };
 
-#if !defined(ETL_OBSERVER_FORCE_CPP03_IMPLEMENTATION)
 //*****************************************************************************
 // The concrete observable 3 class.
 //*****************************************************************************
@@ -141,7 +138,6 @@ public:
     notify_observers(n);
   }
 };
-#endif
 
 //*****************************************************************************
 // The first observer type.
@@ -233,7 +229,6 @@ public:
   int data3_count;
 };
 
-#if !defined(ETL_OBSERVER_FORCE_CPP03_IMPLEMENTATION)
 //*****************************************************************************
 // The third observer type.
 // If any one of the overloads is missing or a parameter declaration is incorrect
@@ -245,6 +240,7 @@ public:
 
   ObserverVoidInt()
     : data1_count(0)
+    , data2_count(0)
   {
   }
 
@@ -261,13 +257,12 @@ public:
   //*******************************************
   void notification(int)  override
   {
-    ++data1_count;
+    ++data2_count;
   }
 
   int data1_count;
   int data2_count;
 };
-#endif
 
 namespace
 {
@@ -556,7 +551,6 @@ namespace
       CHECK_EQUAL(0UL, observable.number_of_observers());
     }
 
-#if !defined(ETL_OBSERVER_FORCE_CPP03_IMPLEMENTATION)
     //*************************************************************************
     TEST(test_void_int_observable)
     {
@@ -570,9 +564,13 @@ namespace
 
       // Send the notifications.
       observable.send_notifications();
+      CHECK_EQUAL(1U, observer.data1_count);
+      CHECK_EQUAL(0U, observer.data2_count);
+
       observable.send_notifications(1);
+      CHECK_EQUAL(1U, observer.data1_count);
+      CHECK_EQUAL(1U, observer.data2_count);
     }
-#endif
   }
 }
 
