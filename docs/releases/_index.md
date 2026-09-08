@@ -76,6 +76,7 @@ Click on the links to see the original Github page.
 [#1588](https://github.com/ETLCPP/etl/pull/1588) Optimize `format.h`
 [#1589](https://github.com/ETLCPP/etl/pull/1589) Fix MSVC C4244 warning in format specifiers
 [#1591](https://github.com/ETLCPP/etl/pull/1591) Fix false positive warning from GCC 16
+[#1595](https://github.com/ETLCPP/etl/pull/1595) Support runtime floating-point clamped_value before C++20
 
 ## 20.48.1
 
