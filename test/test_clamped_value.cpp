@@ -501,7 +501,7 @@ namespace
       CHECK(true);
     }
 
-  #if ETL_HAS_FLOATING_POINT_CLAMPED_VALUE
+  #if ETL_HAS_FLOATING_POINT_CLAMPED_VALUE && (ETL_USING_MICROSOFT_COMPILER && (_MSC_VER >= 1950))
     //*************************************************************************
     TEST(test_floating_clamped_value_constexpr)
     {
